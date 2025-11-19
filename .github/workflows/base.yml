@@ -50,10 +50,10 @@ jobs:
             docker run -d \
               --name send-mail-nodemailer \
               --network occean \
-              --ip 172.25.0.17 \
+              --ip 172.25.0.21 \
               --cap-add=SYS_ADMIN \
               --user 0:0\
-              -e PORT=3070 \
+              -e PORT=3434 \
               -e TZ=America/Mexico_City \
               --restart always \
               ghcr.io/elimeleth/send-mail-nodemailer:latest
