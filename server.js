@@ -22,13 +22,16 @@ app.post("/send-email", upload.single("file"), async (req, res) => {
       ? [{ filename: req.file.originalname, path: req.file.path }]
       : [];
 
-    await transporter.sendMail({
+      console.log("Enviando correo de:", from, "a:", to);
+   const resposne =  await transporter.sendMail({
       from,
       to,
       subject,
       text: body,
       attachments
     });
+
+    console.log("Correo enviado:", resposne.messageId);
 
     res.json({ message: "Correo enviado" });
   } catch (e) {
@@ -49,7 +52,14 @@ app.listen(3434, () => {
   auth: {
     user: process.env.USERNAME_EMAIL,
     pass: process.env.PWD_EMAIL
-  }
+  },
+  family: 4, // <--- FUERZA IPV4 (Evita que se cuelgue por IPv6)
+    connectionTimeout: 10000, // 10 segundos máximo para conectar
+    greetingTimeout: 5000,    // 5 segundos para esperar el saludo
+    // 👆 FIN DE LA SOLUCIÓN 👆
+    
+    debug: true,
+    logger: true
 });
 
 // Verify transporter
