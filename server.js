@@ -22,8 +22,8 @@ app.post("/send-email", upload.single("file"), async (req, res) => {
       ? [{ filename: req.file.originalname, path: req.file.path }]
       : [];
 
-      console.log("Enviando correo de:", from, "a:", to);
-   const resposne =  await transporter.sendMail({
+    console.log("Enviando correo de:", from, "a:", to);
+    const resposne = await transporter.sendMail({
       from,
       to,
       subject,
@@ -46,29 +46,28 @@ app.get("/", (req, res) => {
 
 app.listen(3434, () => {
   transporter = nodemailer.createTransport({
-  host: "smtp.dreamhost.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.USERNAME_EMAIL,
-    pass: process.env.PWD_EMAIL
-  },
-  family: 4, // <--- FUERZA IPV4 (Evita que se cuelgue por IPv6)
-    connectionTimeout: 10000, // 10 segundos máximo para conectar
-    greetingTimeout: 5000,    // 5 segundos para esperar el saludo
+    host: "smtp.dreamhost.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.USERNAME_EMAIL,
+      pass: process.env.PWD_EMAIL
+    },
+    connectionTimeout: 50000, // 10 segundos máximo para conectar
+    greetingTimeout: 30000,    // 5 segundos para esperar el saludo
     // 👆 FIN DE LA SOLUCIÓN 👆
-    
+
     debug: true,
     logger: true
-});
+  });
 
-// Verify transporter
-transporter.verify((error) => {
-  if (error) {
-    console.error("❌ Error verificando transporte:", error);
-  } else {
-    console.log("✅ Transporte SMTP listo");
-  }
-});
+  // Verify transporter
+  transporter.verify((error) => {
+    if (error) {
+      console.error("❌ Error verificando transporte:", error);
+    } else {
+      console.log("✅ Transporte SMTP listo");
+    }
+  });
   console.log("API lista en puerto 3434")
 });
