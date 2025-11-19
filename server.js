@@ -41,7 +41,7 @@ app.get("/", (req, res) => {
   res.send("API de envío de correos funcionando");
 });
 
-app.listen(3000, () => {
+app.listen(3434, () => {
   transporter = nodemailer.createTransport({
   host: "smtp.dreamhost.com",
   port: 587,
