@@ -1,0 +1,60 @@
+name: build
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  create-docker-image:
+    runs-on: ubuntu-latest
+
+    concurrency: 
+      group: ${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - name: checkout code
+        uses: actions/checkout@v2
+      
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GH_TOKEN }}
+      
+      - name: Build and push send-mail-nodemailer
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/elimeleth/send-mail-nodemailer:latest
+        continue-on-error: false
+
+  deploy:
+    needs: create-docker-image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install sshpass
+        run: sudo apt-get install -y sshpass
+
+      - name: SSH into Server
+        env:
+            SSHPASS: ${{ secrets.AUTH_PASS }}
+        run: |
+          sshpass -p '${{secrets.AUTH_PASS}}' ssh -o StrictHostKeyChecking=no ${{secrets.AUTH_SERVER}} << EOF
+            docker login ghcr.io -u elimeleth -p ${{secrets.GH_TOKEN}}
+            docker pull ghcr.io/elimeleth/send-mail-nodemailer:latest
+            docker rm -f send-mail-nodemailer 2>/dev/null
+            docker run -d \
+              --name send-mail-nodemailer \
+              --network occean \
+              --ip 172.25.0.17 \
+              --cap-add=SYS_ADMIN \
+              --user 0:0\
+              -e PORT=3070 \
+              -e TZ=America/Mexico_City \
+              --restart always \
+              ghcr.io/elimeleth/send-mail-nodemailer:latest
+          EOF
