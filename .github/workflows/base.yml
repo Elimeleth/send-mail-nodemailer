@@ -53,6 +53,8 @@ jobs:
               --ip 172.25.0.21 \
               --cap-add=SYS_ADMIN \
               --user 0:0\
+              -e PWD_EMAIL=${{secrets.PWD_EMAIL}} \
+              -e USER_EMAIL=${{secrets.USERNAME_EMAIL}} \
               -e PORT=3434 \
               -e TZ=America/Mexico_City \
               --restart always \
