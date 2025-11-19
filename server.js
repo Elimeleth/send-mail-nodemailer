@@ -60,5 +60,5 @@ transporter.verify((error) => {
     console.log("✅ Transporte SMTP listo");
   }
 });
-  console.log("API lista en puerto 3000")
+  console.log("API lista en puerto 3434")
 });
